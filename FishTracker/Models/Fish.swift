@@ -9,7 +9,7 @@
 // Fish.swift
 import Foundation
 
-enum FishSize: String, Codable {
+enum FishSize: String, Codable, CaseIterable {
     case small, medium, large, colossal
 }
 

@@ -30,6 +30,32 @@ struct StatsView: View {
                     }
                 }
 
+                Section(header: Text("Base Probabilities (No Bait)")) {
+                    Text("Rarity Distribution (%):")
+                        .font(.subheadline)
+                        .padding(.top, 5)
+                    ForEach(Rarity.allCases, id: \.self) { rarity in
+                        let percentage = viewModel.baseRarityProbabilities[rarity] ?? 0
+                        HStack {
+                            Text("Rarity \(rarity.rawValue):")
+                            Spacer()
+                            Text(String(format: "%.1f%%", percentage))
+                        }
+                    }
+
+                    Text("Size Distribution (%):")
+                        .font(.subheadline)
+                        .padding(.top, 5)
+                    ForEach(FishSize.allCases, id: \.self) { size in
+                        let percentage = viewModel.baseSizeProbabilities[size] ?? 0
+                        HStack {
+                            Text("Size \(size.rawValue.capitalized):")
+                            Spacer()
+                            Text(String(format: "%.1f%%", percentage))
+                        }
+                    }
+                }
+                
                 Section(header: Text("Catches by Bait")) {
                     ForEach([nil] + FishViewModel.testBaitData, id: \.self) { bait in
                         let baitName = bait?.name ?? "No Bait"

@@ -216,6 +216,50 @@ class FishViewModel: ObservableObject {
     @Published var availableFish: [Fish] = []
     @Published var catches: [Catch] = []
 
+    // Function to calculate base rarity probabilities from data without bait
+    var baseRarityProbabilities: [Rarity: Double] {
+        let noBaitCatches = catches.filter { $0.baitUsed == nil }
+        let totalNoBaitCatches = noBaitCatches.count
+
+        guard totalNoBaitCatches > 0 else {
+            // Return zeros if no data is available
+            return Rarity.allCases.reduce(into: [:]) { $0[$1] = 0 }
+        }
+
+        var rarityCounts = Rarity.allCases.reduce(into: [:]) { $0[$1] = 0 }
+
+        for catchEntry in noBaitCatches {
+            rarityCounts[catchEntry.fish.rarity, default: 0] += 1
+        }
+
+        // Calculate percentages
+        let rarityPercentages = rarityCounts.mapValues { Double($0) / Double(totalNoBaitCatches) * 100 }
+
+        return rarityPercentages
+    }
+
+    // Function to calculate base size probabilities from data without bait
+    var baseSizeProbabilities: [FishSize: Double] {
+        let noBaitCatches = catches.filter { $0.baitUsed == nil }
+        let totalNoBaitCatches = noBaitCatches.count
+
+        guard totalNoBaitCatches > 0 else {
+            // Return zeros if no data is available
+            return FishSize.allCases.reduce(into: [:]) { $0[$1] = 0 }
+        }
+
+        var sizeCounts = FishSize.allCases.reduce(into: [:]) { $0[$1] = 0 }
+
+        for catchEntry in noBaitCatches {
+            sizeCounts[catchEntry.fish.size, default: 0] += 1
+        }
+
+        // Calculate percentages
+        let sizePercentages = sizeCounts.mapValues { Double($0) / Double(totalNoBaitCatches) * 100 }
+
+        return sizePercentages
+    }
+
     init() {
         loadCatches()
         updateAvailableFish()
@@ -249,5 +293,53 @@ class FishViewModel: ObservableObject {
     func resetCatches() {
         catches.removeAll()
         UserDefaults.standard.removeObject(forKey: "catches")
+    }
+    
+    func expectedRarityDistribution(for bait: Bait?) -> [Rarity: Double] {
+        let baseProbabilities = baseRarityProbabilities
+
+        guard let bait = bait else {
+            // Return base probabilities if no bait is used
+            return baseProbabilities
+        }
+
+        var adjustedProbabilities = baseProbabilities
+
+        // Increase probabilities based on bait's rarityIncreasePercent
+        for rarity in Rarity.allCases {
+            adjustedProbabilities[rarity]! *= (1 + bait.rarityIncreasePercent / 100)
+        }
+
+        // Normalize the probabilities to sum to 100%
+        let total = adjustedProbabilities.values.reduce(0, +)
+        if total > 0 {
+            adjustedProbabilities = adjustedProbabilities.mapValues { ($0 / total) * 100 }
+        }
+
+        return adjustedProbabilities
+    }
+    
+    func expectedSizeDistribution(for bait: Bait?) -> [FishSize: Double] {
+        let baseProbabilities = baseSizeProbabilities
+
+        guard let bait = bait else {
+            // Return base probabilities if no bait is used
+            return baseProbabilities
+        }
+
+        var adjustedProbabilities = baseProbabilities
+
+        // Increase probabilities based on bait's sizeIncreasePercent
+        for size in FishSize.allCases {
+            adjustedProbabilities[size]! *= (1 + bait.sizeIncreasePercent / 100)
+        }
+
+        // Normalize the probabilities to sum to 100%
+        let total = adjustedProbabilities.values.reduce(0, +)
+        if total > 0 {
+            adjustedProbabilities = adjustedProbabilities.mapValues { ($0 / total) * 100 }
+        }
+
+        return adjustedProbabilities
     }
 }
