@@ -5,20 +5,26 @@
 //  Created by PJ Gray on 9/15/24.
 //
 
+// ContentView.swift
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @StateObject var viewModel = FishViewModel()
 
-#Preview {
-    ContentView()
+    var body: some View {
+        NavigationView {
+            VStack {
+                BiomeSelectionView(viewModel: viewModel)
+                    .padding()
+                BaitSelectionView(viewModel: viewModel)
+                    .padding()
+                FishListView(viewModel: viewModel)
+                NavigationLink(destination: StatsView(viewModel: viewModel)) {
+                    Text("View Statistics")
+                }
+                .padding()
+            }
+            .navigationTitle("Fish Tracker")
+        }
+    }
 }
