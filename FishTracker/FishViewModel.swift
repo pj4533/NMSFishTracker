@@ -342,4 +342,44 @@ class FishViewModel: ObservableObject {
 
         return adjustedProbabilities
     }
+    
+    // Actual Rarity Distribution
+    func actualRarityDistribution(for bait: Bait?) -> [Rarity: Double] {
+        let baitCatches = catches.filter { $0.baitUsed?.name == bait?.name }
+        let totalCatches = baitCatches.count
+
+        guard totalCatches > 0 else {
+            return Rarity.allCases.reduce(into: [:]) { $0[$1] = 0 }
+        }
+
+        var rarityCounts = Rarity.allCases.reduce(into: [:]) { $0[$1] = 0 }
+
+        for catchEntry in baitCatches {
+            rarityCounts[catchEntry.fish.rarity, default: 0] += 1
+        }
+
+        let rarityPercentages = rarityCounts.mapValues { Double($0) / Double(totalCatches) * 100 }
+
+        return rarityPercentages
+    }
+
+    // Actual Size Distribution
+    func actualSizeDistribution(for bait: Bait?) -> [FishSize: Double] {
+        let baitCatches = catches.filter { $0.baitUsed?.name == bait?.name }
+        let totalCatches = baitCatches.count
+
+        guard totalCatches > 0 else {
+            return FishSize.allCases.reduce(into: [:]) { $0[$1] = 0 }
+        }
+
+        var sizeCounts = FishSize.allCases.reduce(into: [:]) { $0[$1] = 0 }
+
+        for catchEntry in baitCatches {
+            sizeCounts[catchEntry.fish.size, default: 0] += 1
+        }
+
+        let sizePercentages = sizeCounts.mapValues { Double($0) / Double(totalCatches) * 100 }
+
+        return sizePercentages
+    }
 }
