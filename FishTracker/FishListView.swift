@@ -7,23 +7,44 @@
 
 
 // FishListView.swift
+
 import SwiftUI
 
 struct FishListView: View {
     @ObservedObject var viewModel: FishViewModel
+    @State private var selectedFish: Fish?
+    @State private var showConfirmation = false
 
     var body: some View {
         List(viewModel.availableFish) { fish in
             Button(action: {
-                viewModel.recordCatch(fish: fish)
+                selectedFish = fish
+                showConfirmation = true
             }) {
                 HStack {
-                    Text(fish.name)
+                    VStack(alignment: .leading) {
+                        Text(fish.name)
+                        Text("Trait: \(fish.trait.rawValue.capitalized)")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
                     Spacer()
-                    Text(fish.rarity.rawValue)
+                    Text("Rarity \(fish.rarity.rawValue)")
                         .foregroundColor(.gray)
                 }
             }
+        }
+        .alert(isPresented: $showConfirmation) {
+            Alert(
+                title: Text("Confirm Catch"),
+                message: Text("Caught: \(selectedFish?.name ?? "Unknown Fish")"),
+                primaryButton: .default(Text("Yes")) {
+                    if let fish = selectedFish {
+                        viewModel.recordCatch(fish: fish)
+                    }
+                },
+                secondaryButton: .cancel(Text("No"))
+            )
         }
     }
 }

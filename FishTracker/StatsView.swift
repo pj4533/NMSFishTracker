@@ -12,6 +12,7 @@ import SwiftUI
 
 struct StatsView: View {
     @ObservedObject var viewModel: FishViewModel
+    @State private var showResetConfirmation = false
 
     var body: some View {
         VStack {
@@ -28,12 +29,22 @@ struct StatsView: View {
 
             // Reset Catches Button
             Button(action: {
-                viewModel.resetCatches()
+                showResetConfirmation = true
             }) {
                 Text("Reset Catches")
                     .foregroundColor(.red)
             }
             .padding()
+            .alert(isPresented: $showResetConfirmation) {
+                Alert(
+                    title: Text("Confirm Reset"),
+                    message: Text("Are you sure you want to reset all catches? This action cannot be undone."),
+                    primaryButton: .destructive(Text("Reset")) {
+                        viewModel.resetCatches()
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
         }
         .navigationTitle("Statistics")
     }

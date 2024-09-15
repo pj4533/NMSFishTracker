@@ -93,7 +93,7 @@ class FishViewModel: ObservableObject {
         Fish(name: "Lamptip Ray", size: .small, biomes: [.hot], rarity: .B, trait: .night),
         Fish(name: "Pyrefin", size: .small, biomes: [.hot], rarity: .B, trait: .none),
         Fish(name: "Flashfire Eel", size: .medium, biomes: [.hot], rarity: .B, trait: .storm),
-//        Fish(name: "Longjaw Snapper", size: .medium, biomes: [.hot], rarity: .B, trait: .none),
+        Fish(name: "Solar Roach", size: .medium, biomes: [.hot], rarity: .B, trait: .day),
         Fish(name: "Fumarole Gulper", size: .large, biomes: [.hot], rarity: .B, trait: .none),
         Fish(name: "Colossal Meltfin", size: .colossal, biomes: [.hot], rarity: .B, trait: .none),
         Fish(name: "Cadmium Pearlcase", size: .small, biomes: [.hot], rarity: .A, trait: .none),
